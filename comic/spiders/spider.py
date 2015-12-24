@@ -8,10 +8,20 @@ class comicSpider(scrapy.Spider):
     name = "comic"
     allowed_domains = ["comic.ck101.com"]
     start_urls = (
-        'http://comic.ck101.com/comic/170/0/0/1',
+        'http://comic.ck101.com/comic/170',
     )
 
     def parse(self, response):
+        total_num = 19  # todo
+        urls = ['http://comic.ck101.com/comic/170/0/0/' + str(i) for i in range(1, 20)]
+        for url in urls:
+            r = Request(url, callback=self.parse_pagination)
+            yield r
+
+
+
+
+    def parse_pagination(self, response):
         name = response.xpath('/html/body/div[4]/div[2]/div[1]/ul/li[3]/h1/text()').extract()[0]
         # filter '/'
         name = name.split('/')[0].strip()
