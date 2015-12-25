@@ -22,7 +22,7 @@ class MyImagePipelines(ImagesPipeline):
     def file_path(self, request, response=None, info=None):
         item = request.meta['item']
         # 从URL提取图片的文件名
-        img_name = str(item['img_num']) + '.' + item['image_urls'][0].split('.')[-1]
+        img_name = str(item['total_num']) + '-' + str(item['img_num']) + '.' + item['image_urls'][0].split('.')[-1]
 
         filepath = item['name'] + '/' + item['episode'] + '/' + img_name
         return filepath

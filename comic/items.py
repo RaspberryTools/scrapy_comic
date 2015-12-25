@@ -13,6 +13,7 @@ class ComicItem(Item):
     # name = scrapy.Field()
     name = Field()
     episode = Field()
+    total_num = Field()
     img_num = Field()
     image_urls = Field()
     image = Field()
