@@ -9,18 +9,20 @@ class comicSpider(scrapy.Spider):
     name = "comic"
     allowed_domains = ["comic.ck101.com"]
     start_urls = (
-        'http://comic.ck101.com/comic/170',
+        'http://comic.ck101.com/comic/6643',
     )
 
     def parse(self, response):
-        total_num = 19  # todo
-        urls = ['http://comic.ck101.com/comic/170/0/0/' + str(i) for i in range(1, 10)]
+        if response.xpath('//div[@class="pagination"]'):
+            total_num = response.xpath('//div[@class="pagination"]/a/text()').re(r'\d+')[-1]
+            total_num = int(total_num)
+            urls = [response.url + '/1/0/' + str(i) for i in range(1, total_num+1)]
+        else:
+            urls = [response.url + '/0/0/1']
         for url in urls:
             r = Request(url, callback=self.parse_pagination)
+            print url
             yield r
-
-
-
 
     def parse_pagination(self, response):
         name = response.xpath('/html/body/div[4]/div[2]/div[1]/ul/li[3]/h1/text()').extract()[0]
@@ -46,7 +48,6 @@ class comicSpider(scrapy.Spider):
         local_item = response.meta['item']
 
         for index, page in enumerate(episode_pages):
-            print page
             r = Request(page, callback=self.parse_episode_page)
             item = deepcopy(local_item)
             item['episode'] = episode
@@ -58,9 +59,6 @@ class comicSpider(scrapy.Spider):
     def parse_episode_page(self, response):
         item = response.meta['item']
         img_url = response.xpath('//*[@id="defualtPagePic"]/@src').extract()[0]
-        print img_url
         item['image_urls'] = [img_url]
         return item
-
-
 
