@@ -2,6 +2,7 @@
 import scrapy
 from scrapy import Request
 from comic.items import ComicItem
+from copy import deepcopy
 
 
 class comicSpider(scrapy.Spider):
@@ -42,11 +43,12 @@ class comicSpider(scrapy.Spider):
 
         base_url = response.url[:-1]
         episode_pages = [base_url + str(i) for i in range(1, total_num+1)]
+        local_item = response.meta['item']
 
         for index, page in enumerate(episode_pages):
             print page
             r = Request(page, callback=self.parse_episode_page)
-            item = response.meta['item']
+            item = deepcopy(local_item)
             item['episode'] = episode
             item['img_num'] = index
             item['total_num'] = total_num
@@ -55,7 +57,7 @@ class comicSpider(scrapy.Spider):
 
     def parse_episode_page(self, response):
         item = response.meta['item']
-        img_url = response.xpath('//*[@id="defualtPagePic"]/@src').extract()[0]:
+        img_url = response.xpath('//*[@id="defualtPagePic"]/@src').extract()[0]
         print img_url
         item['image_urls'] = [img_url]
         return item
